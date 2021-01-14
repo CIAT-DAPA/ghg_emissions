@@ -1,117 +1,79 @@
-# GEE Satellite data
+# Greenhouse gas (GHG) emissions for agriculture
 <p align="center">
 <img src="https://ciat.cgiar.org/wp-content/uploads/Alliance_logo.png" alt="CIAT" id="logo" data-height-percentage="90" data-actual-width="140" data-actual-height="55">
+<img src="images/CCAFS.png" alt="CCAFS" id="logo2" data-height-percentage="90" width="230" height="52">
 </p>
 
-**Contact:** Andrés Aguilar (a.aguilar@cgiar.org)
 
-## 1. Purpose
+## 1. Introducción
 
-This repository was created for downloading and processing satellite data. The required inputs are the path, in which contains a vector file in ESRI-Shapefile format for the region of interest, and the satellite mission index. 
+The GHG measurement, produced by agricultural activities such as fertilizers, irrigation, tillage, among others, is important for quantifying the impact that this sector has on climate change. For that reason, several methodologies have been proposed to address a baseline measurement using data from farmers. The main purpose of this repository is to offer a tool able to gauge GHG emissions estimation for multiple commercial cropping events. It is important to mention that this work is based on the Mitigation Option Tool for Agriculture project([CCAFS - MOT](https://ccafs.cgiar.org/research/projects/mitigation-options-tool-agriculture-ccafs-mot)) developed by CCAFS and The Aberdeen University.
 
-## 2. Usage
 
-* **Step 1:** [Sign up](https://earthengine.google.com/signup/) for [Google Earth Engine](https://earthengine.google.com/).
-* **Step 2:** Install conda or minicoda.
-* **Step 3:** Install the [Google Earth Engine Plugin for python](https://developers.google.com/earth-engine/python_install-conda)
-* **Step 4:** Git clone or [download](https://github.com/anaguilarar/gee_satellite_data.git) this repository.
-
-## 3. Requirements
+## Requirements
 
 * Python Version >= 3.6
 * Libraries:
-    *   earthengine-api==0.1.211
-    *   pyproj==2.6.1
-    *   pandas 
-    *   geopandas==0.7.0 
-    *   numpy
-    *   folium
-    *   geehydro
-    *   wget
-    *   json
-
+```txt
+    pandas==1.1.0
+    rasterio==1.1.8
+    matplotlib==3.3.2
+    numpy==1.19.1
+```
 ## Get started
 
-The following example shows a workflow for querying, previewing and downloading satellite data from Google Earth Engine using Python.
-Currently, there are available three different missions. 
-  * [Sentinel 2 level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR)
-  * [Sentinel 1 GRD](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S1_GRD)
-  * [Landsat 8 surface reflectance](https://developers.google.com/earth-engine/datasets/catalog/LANDSAT_LC08_C01_T1_SR)
+The following example shows how to use this code for ghg emissions 
 
+###  Organice your Input
 
-###  Sentinel - 2 query
+The inputs file must contain certain amount of parameters for each crop event(please check the example locateds in data folder).
+There are two files, which one reffers to general information about the crop event, and second one provides insights about the fertilizers used furing the crop cicle.
 
-The first step is to check how many images suit in the query requirements 
+The general information that are required for running the code are:
+
+* id_event: Which is an unique idetification for the crop event.
+* longitude and latitude: these are the field spatial coordinates 
+* climate: 
+* crop: crop that was planted.
+* crop_yield_kg_ha: crop productivity
+
+The fertiliser file must have the following variables:
+
+* id_event: Which is an unique idetification for the crop event.
+* fertliser_product: fertilizer that was used during the crop cicle.
+* amount_kg_ha: how many kg/ha of fertliser was added to the soil.
+
+Aditional variables are expleained in each excel file.
+
+Once both files are filled with the required inputs, you can start with the code.
 
 ```python
-from scripts import gee_satellite_data
+from scripts import crop_ghg_emissions as ghg
 
-sentinel2 = gee_satellite_data.get_gee_data("2019-06-01", ## start date
-                                            "2019-09-28", ## end query date
-                                            "data/col_t3.shp", ## region of interest
-                                            "sentinel2_sr", ## mission
-                                            cloud_percentage= 80 ## cloud percetage per image 
-                                           )
+ghg_data = ghg.ghg_emissions('data/inputs_mot_example.xlsx', ## file path to the general information 
+                             'data/fertiliser_inputs_mot_example.xlsx', ## file path to the fertilizers information   
+                             id_event= 'event_7' ## you can ppoint out an specif crop event, or for run through the all events don't put this paremeter)
 ```
 ### Visualization
 
-The visualization is done throughout the folium library (please check out the requirements). Once an image of interest was chosen, you must indicate which is the image number that is going to be plot. 
+A bar blot is used to show the CO<sub>2</sub> eq . ha<sup>-1</sup> for each emission sources. 
 
 ```python
-## print a query summary table
-print(sentinel2.summary)
-
-## visualization parameters
-truecolorParams = {'gamma': 1.3, 
-                   'min': 57,
-                   'max': 2000,
-                   'bands': ['B4','B3','B2']
-                   }
-
-imageindex = 9
-
-imagetoplot = sentinel2.image_collection.toList(sentinel2.image_collection.size()).get(imageindex)
-
-gee_satellite_data.plot_eeimage(imagetoplot, truecolorParams, sentinel2.geometry, zoom = 11)
+plot_functions.bar_plot_emissions(
+    ghg_data.emissions_summary, #  table summary obtained from previous step
+    'mean' # function to aggregated all crop events)
 
 ```
+<p align="center">
+<img src="images/output1.png" alt="barplot" id="logo" width="400" height="200">
+</p>
 
-### Vegetation indices aggregation
+### Data downloading
 
-In order to visualice the crop plants vigorosity, the code allows to add a NDVI band. 
-
-```python
-### adding a NDVI layer
-sentinel2.add_vi_layer("ndvi")
-
-ndviParams = {     'min': 0,
-                   'max': 1,
-                   'palette': ['#FF0000', '#00FF00'],
-                   'bands': ['ndvi']
-                   }
-
-
-imageindex = 9
-
-imagetoplot = sentinel2.image_collection.toList(sentinel2.image_collection.size()).get(imageindex)
-
-gee_satellite_data.plot_eeimage(imagetoplot, 
-                                ndviParams, 
-                                sentinel2.geometry, 
-                                zoom = 11)
-```
-
-### Images downloading
-
-Finally, you can download the images by pointing out which is going to be the destination folder path and.
+Finally, you can download the summary table, which is a pandas dataframe type. Only one parameter must be provided which is the file output path.
 
 ```python
-gee_satellite_data.download_gee_tolocal(sentinel2, ## 
-                                        'gee_satellitedata/s2_processed', ## outputpath 
-                                        "col_t3", ## a suffix reference for the area that was query
-                                        10, ## the spatial resolution in meters
-                                        bands = ['B2', 'B3', 'B4', 'B8', 'ndvi']
-                                       )
+ghg_data.emissions_summary.to_csv("example.csv")
 ```
 
 
