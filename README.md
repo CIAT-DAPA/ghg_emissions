@@ -7,7 +7,7 @@
 
 ## 1. Introduction
 
-The GHG measurement, produced by agricultural activities such as fertilizers, irrigation, tillage, among others, is important for quantifying the impact that this sector has on climate change. For that reason, several methodologies have been proposed to address a baseline measurement using data from farmers. The main purpose of this repository is to offer a tool able to gauge GHG emissions estimation for multiple commercial cropping events. It is important to mention that this work is based on the Mitigation Option Tool for Agriculture project([CCAFS - MOT](https://ccafs.cgiar.org/research/projects/mitigation-options-tool-agriculture-ccafs-mot)) developed by CCAFS and The Aberdeen University.
+The GHG measurement, produced by agricultural activities such as fertilizers, irrigation, tillage, among others, is important for quantifying the impact that this sector has on climate change. For that reason, several methodologies have been proposed to address a baseline measurement using data from farmers. The main purpose of this repository is to offer a tool able to gauge GHG emissions estimation for multiple commercial cropping events. It is important to mention that this work is based on the Mitigation Option Tool for Agriculture project([CCAFS - MOT](https://ccafs.cgiar.org/research/projects/mitigation-options-tool-agriculture-ccafs-mot)) developed by CCAFS and The Aberdeen University. 
 
 
 ## Requirements
@@ -31,21 +31,22 @@ There are two files, one refers to general information about the crop event, and
 
 The general information that is required for running the code is:
 
-* id_event: This is a unique identification for the crop event.
+* id_event: This is an unique identification code for each crop event.
 * longitude and latitude: these are the field spatial coordinates 
-* climate: 
-* crop: a crop that was planted.
+* crop: crop that was planted.
 * crop_yield_kg_ha: crop productivity
 
 The fertilizer file must have the following variables:
 
-* id_event: This is a unique identification for the crop event.
+* id_event: This is an unique identification code for each crop event.
 * fertliser_product: fertilizer that was used during the crop cycle.
 * amount_kg_ha: how many kg/ha of fertiliser was added to the soil.
 
+Moreover, there are other optional variables related to climate and soil. These insights can be provided by the users otherwise they are going to be inferred from secondary sources. for example, in the case of soil, we use the provided coordinates for extracting data from [SoilGrid](https://soilgrids.org/) project. For climate, we use the Saire's [climate region classification](https://www.sciencedirect.com/science/article/pii/S2351989419307231?via%3Dihub). 
+
 Additional variables are explained in each excel file.
 
-Once both files are filled in with the required inputs, you can start with the code.
+Once both files are filled with the required inputs, you can start with the code. 
 
 ```python
 from scripts import crop_ghg_emissions as ghg
@@ -70,7 +71,7 @@ plot_functions.bar_plot_emissions(
 
 ### Data downloading
 
-Finally, you can download the summary table, which is a pandas dataframe type. Only one parameter must be provided which is the file output path.
+Finally, you can download the summary table, which is a pandas dataframe type. Only one parameter must be provided, the file output path.
 
 ```python
 ghg_data.emissions_summary.to_csv("example.csv")
@@ -78,5 +79,5 @@ ghg_data.emissions_summary.to_csv("example.csv")
 
 ### Examples
 
-Please feel free to check the examples created in Colab.
+Please feel free to check the example file created in Colab.
 
