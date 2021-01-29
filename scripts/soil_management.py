@@ -473,25 +473,25 @@ class soil_management_emissions:
         if np.logical_not(pd.isnull(self._longitude) or
                           pd.isnull(self._latitude)):
 
-            soil_organic_stock = sgf.get_soilgridpixelvalue(SOILGRID_ORGANIC_CARBON_STOCK_PATH,
+            soil_organic_stock = sgf.get_soilgridpixelvalue("Soil organic carbon stock",
                                                             self._longitude, self._latitude)* 1000
 
-            soil_bulk_density = sgf.get_soilgridpixelvalue(SOILGRID_BULKDENSITY_PATH,
+            soil_bulk_density = sgf.get_soilgridpixelvalue("Bulk density",
                                                                self._longitude, self._latitude)/ 100
 
             if pd.isnull(self.n_content):
-                n_content = sgf.get_soilgridpixelvalue(SOILGRID_NITROGEN_PATH,
+                n_content = sgf.get_soilgridpixelvalue("Nitrogen",
                                                        self._longitude, self._latitude) / 1000
             else:
                 n_content = self.n_content
 
             if pd.isnull(self.pH_content):
-                pH_content = sgf.get_soilgridpixelvalue(SOILGRID_PH_PATH,
+                pH_content = sgf.get_soilgridpixelvalue("pH water",
                                                         self._longitude, self._latitude)/ 10
             else:
                 pH_content = self.pH_content
 
-            soil_organic_content = sgf.get_soilgridpixelvalue(SOILGRID_ORGANIC_CARBON_PATH,
+            soil_organic_content = sgf.get_soilgridpixelvalue("Organic carbon density",
                                                                   self._longitude, self._latitude)/ 100
 
         print("Soil properties were drawn from soilgrid\n bulk_density:{} n_content: {} pH_content: {}, soil_organic_content:{}".format(

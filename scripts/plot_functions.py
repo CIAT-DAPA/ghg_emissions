@@ -42,6 +42,7 @@ def polyfit_smooth(x, y, degree=5, x_seq_seqlength=100):
     return [x_smooth, np.polyval(coefs, x_smooth)]
 
 def yield_emissions_comparison_plot(ghg_df, remove_zeros=True):
+
     datatoplot = pd.DataFrame({'n_amount': ghg_df._N_total_amount,
                                'cropyield': ghg_df._yield,
                                'fertiliser induced emissions': ghg_df.emissions_summary[
