@@ -8,11 +8,12 @@ from scripts import general_functions as gf
 from scripts import fertiliser_practices as fp
 from scripts import rice_estimations as rice
 
-SOILGRID_ORGANIC_CARBON_STOCK_PATH = "soilgrids/ocs_0_30cm_mean_southamerica.tif"
-SOILGRID_ORGANIC_CARBON_PATH = "soilgrids/soc_0_5cm_mean_southamerica.tif"
-SOILGRID_BULKDENSITY_PATH = "soilgrids/bdod_0_5cm_mean_southamerica.tif"
-SOILGRID_PH_PATH = "soilgrids/phh2o_0_5cm_mean_southamerica.tif"
-SOILGRID_NITROGEN_PATH = "soilgrids/nitrogen_0_5cm_mean_southamerica.tif"
+
+# SOILGRID_ORGANIC_CARBON_STOCK_PATH = "soilgrids/ocs_0_30cm_mean_southamerica.tif"
+# SOILGRID_ORGANIC_CARBON_PATH = "soilgrids/soc_0_5cm_mean_southamerica.tif"
+# SOILGRID_BULKDENSITY_PATH = "soilgrids/bdod_0_5cm_mean_southamerica.tif"
+# SOILGRID_PH_PATH = "soilgrids/phh2o_0_5cm_mean_southamerica.tif"
+# SOILGRID_NITROGEN_PATH = "soilgrids/nitrogen_0_5cm_mean_southamerica.tif"
 
 
 class soil_management_emissions:
@@ -224,9 +225,9 @@ class soil_management_emissions:
 
         texture_factorforcec = \
             ef.cec_factors.loc[ef.cec_factors.iloc[:, 1] == self.soil_texture.capitalize()].iloc[:, 2].values[0]
-        if self.soil_bulk_density!=0:
+        if self.soil_bulk_density != 0:
             estimated_soil_cec = ((-59 + 51 * ph_valueforcec) * self.soil_c_stock / 3000000 / self.soil_bulk_density +
-                              (30 + 4.4 * ph_valueforcec) * texture_factorforcec)
+                                  (30 + 4.4 * ph_valueforcec) * texture_factorforcec)
         else:
             estimated_soil_cec = ((-59 + 51 * ph_valueforcec) * self.soil_c_stock / 3000000 / 1 +
                                   (30 + 4.4 * ph_valueforcec) * texture_factorforcec)
@@ -258,7 +259,7 @@ class soil_management_emissions:
         if pd.isnull(tillage_input):
             tillage_input = "na"
 
-        climate_input = self.soil_inputs.climate.values[0]
+        #climate_input = self.soil_inputs.climate.values[0]
 
         years_tillage_tech = self.soil_inputs.time_using_tillage_system.values[0]
 
@@ -272,8 +273,8 @@ class soil_management_emissions:
             tillage_options = [i.lower() for i in tl.tillage_options[1]]
             climate_options = [i.lower() for i in tl.climate_options[1]]
 
-        if (climate_input.lower() in climate_options):
-            self._cl_eng_input = tl.climate_options[1][climate_options.index(climate_input.lower())]
+        # if (climate_input.lower() in climate_options):
+        # self._cl_eng_input = tl.climate_options[1][climate_options.index(climate_input.lower())]
 
         if tillage_input.lower() in tillage_options:
 
@@ -281,6 +282,7 @@ class soil_management_emissions:
             self._til_eng_input = til_eng_input
             to_tillagefilter = ef.tillage_factors.To_till.str.lower() == til_eng_input.lower()
             defaulttillage = ef.tillage_factors.From_till.str.lower() == 'conventional tillage'
+            print("Climate Classification: {}".format(self._cl_eng_input))
             climatefilter = ef.tillage_factors.Climate.str.lower() == self._cl_eng_input.lower()
 
             if climatefilter.sum() == 0:
@@ -341,29 +343,27 @@ class soil_management_emissions:
         """Gauging the emissions by luc"""
         luc_input = self.soil_inputs.luc.values[0]
         luc_time = self.soil_inputs.luc_time.values[0]
-        climate_input = self.soil_inputs.climate.values[0]
 
         if np.isnan(luc_time):
             years_tillage_tech = 10
 
         if self.language == "spanish":
             luc_options = [i.lower() for i in tl.luc_options[0]]
-            climate_options = [i.lower() for i in tl.climate_options[0]]
+            #climate_options = [i.lower() for i in tl.climate_options[0]]
         else:
             luc_options = [i.lower() for i in tl.luc_options[1]]
-            climate_options = [i.lower() for i in tl.climate_options[1]]
+            #climate_options = [i.lower() for i in tl.climate_options[1]]
 
         if np.logical_not(pd.isnull(luc_input)):
 
-            if ((climate_input.lower() in climate_options) &
-                    (luc_input.lower() in luc_options)):
+            if luc_input.lower() in luc_options:
                 luc_eng_input = tl.luc_options[1][luc_options.index(luc_input.lower())]
 
                 changefilter = ef.luc_factors['change-nr'] == ef.luc_options[luc_eng_input][0]
                 climatefilter = ef.luc_factors.Climate.str.lower() == self._cl_eng_input.lower()
                 filter_conditions = climatefilter & changefilter
 
-                if (np.array(filter_conditions).sum() != 0):
+                if np.array(filter_conditions).sum() != 0:
                     luc_factor = ef.luc_factors.factor.loc[filter_conditions].values[0]
                 else:
                     cl_eng_input = tl.world_climate_bouwman[1][tl.world_climate_bouwman[0].index(self._cl_eng_input)]
@@ -387,35 +387,34 @@ class soil_management_emissions:
         crop_input = self.soil_inputs.crop_cover.values[0]
         if pd.isnull(crop_input):
             crop_input = "nan"
-        climate_input = self.soil_inputs.climate.values[0]
+        #climate_input = self.soil_inputs.climate.values[0]
         years_cropcover_tech = self.soil_inputs.time_using_crop_cover.values[0]
 
         if np.isnan(years_cropcover_tech):
             years_cropcover_tech = 10
 
         if self.language == "spanish":
-            climate_options = [i.lower() for i in tl.climate_options[0]]
+            #climate_options = [i.lower() for i in tl.climate_options[0]]
             cover_crop_options = [i.lower() for i in tl.cover_crop_options[0]]
         else:
-            climate_options = [i.lower() for i in tl.climate_options[1]]
+            #climate_options = [i.lower() for i in tl.climate_options[1]]
             cover_crop_options = [i.lower() for i in tl.cover_crop_options[1]]
 
-        if ((climate_input.lower() in climate_options) &
-                (crop_input.lower() in cover_crop_options)):
+        if crop_input.lower() in cover_crop_options:
 
             cc_eng_input = tl.cover_crop_options[1][cover_crop_options.index(crop_input.lower())]
             self._cc_eng_input = cc_eng_input
-            cl_eng_input = tl.climate_options[1][climate_options.index(climate_input.lower())]
+            #cl_eng_input = tl.climate_options[1][climate_options.index(self._cl_eng_input.lower())]
 
             covercropfilter = ef.cover_cropping_factors.Change.str.lower() == cc_eng_input.lower()
-            climatefilter = ef.cover_cropping_factors.Climate.str.lower() == cl_eng_input.lower()
+            climatefilter = ef.cover_cropping_factors.Climate.str.lower() == self._cl_eng_input.lower()
 
             if climatefilter.sum() == 0:
                 cl_eng_input = tl.world_climate_bouwman[1][tl.world_climate_bouwman[0].index(self._cl_eng_input)]
                 climatefilter = ef.cover_cropping_factors.Climate.str.lower() == cl_eng_input.lower()
 
             filter_conditions = climatefilter & covercropfilter
-            if (np.array(filter_conditions).sum() != 0):
+            if np.array(filter_conditions).sum() != 0:
                 factor_change_20years = ef.cover_cropping_factors.Factor.loc[filter_conditions].values[0]
             else:
                 factor_change_20years = 1
@@ -438,7 +437,7 @@ class soil_management_emissions:
     def __init__(self,
                  input_table,
                  language="spanish"):
-        self._cl_eng_input = np.nan
+
         self._til_eng_input = np.nan
         self._cc_eng_input = np.nan
 
@@ -448,7 +447,17 @@ class soil_management_emissions:
         self.crop_yield_kg_ha = self.soil_inputs.crop_yield_kg_ha.values[0]
         self._longitude = self.soil_inputs.longitude.values[0]
         self._latitude = self.soil_inputs.latitude.values[0]
-        self.get_soil_properties()  ##
+
+        ### get climate intput from coordinates
+        self._cl_eng_input = 'temperate continental'
+
+        if (np.logical_not(pd.isnull(self._longitude)) and
+                np.logical_not(pd.isnull(self._latitude))):
+            climate_classification = get_climate_fromlayers(self._longitude,
+                                                            self._latitude)
+            self._cl_eng_input = mot_climate_classification(climate_classification)
+
+        self.get_soil_properties()  ##.
 
         ## calculating soil carbon stock
         if np.logical_not(np.isnan(self.soil_organic_c)) and np.logical_not(np.isnan(self.soil_bulk_density)):
@@ -470,14 +479,15 @@ class soil_management_emissions:
         soil_bulk_density = 0
         n_content = 0
         pH_content = 0
+
         if np.logical_not(pd.isnull(self._longitude) or
                           pd.isnull(self._latitude)):
 
             soil_organic_stock = sgf.get_soilgridpixelvalue("Soil organic carbon stock",
-                                                            self._longitude, self._latitude)* 1000
+                                                            self._longitude, self._latitude) * 1000
 
             soil_bulk_density = sgf.get_soilgridpixelvalue("Bulk density",
-                                                               self._longitude, self._latitude)/ 100
+                                                           self._longitude, self._latitude) / 100
 
             if pd.isnull(self.n_content):
                 n_content = sgf.get_soilgridpixelvalue("Nitrogen",
@@ -487,23 +497,54 @@ class soil_management_emissions:
 
             if pd.isnull(self.pH_content):
                 pH_content = sgf.get_soilgridpixelvalue("pH water",
-                                                        self._longitude, self._latitude)/ 10
+                                                        self._longitude, self._latitude) / 10
             else:
                 pH_content = self.pH_content
 
             soil_organic_content = sgf.get_soilgridpixelvalue("Organic carbon density",
-                                                                  self._longitude, self._latitude)/ 100
+                                                              self._longitude, self._latitude) / 100
 
-        print("Soil properties were drawn from soilgrid\n bulk_density:{} n_content: {} pH_content: {}, soil_organic_content:{}".format(
-            soil_bulk_density,
-            n_content, pH_content,
-            soil_organic_content))
+        print(
+            "Soil properties were drawn from soilgrid\n bulk_density:{} n_content: {} pH_content: {}, soil_organic_content:{}".format(
+                soil_bulk_density,
+                n_content, pH_content,
+                soil_organic_content))
         return [soil_organic_stock, soil_bulk_density,
                 n_content, pH_content, soil_organic_content]
 
 
+def get_climate_fromlayers(longitude, latitude):
+    """ get climate classification from layers
+    :param longitude: wgs 84 longitude
+    :param latitude: wgs 84 latitude
+    :return: str list: koppen classification and climateregion classification
+    """
+    koppen_path = "climate_classification/world_climate_class_koppen.tif"
+    koppen_value = sgf.getCoordinatePixel(koppen_path, longitude, latitude)
+
+    if len(koppen_value[0]) > 0:
+        koppen_value = koppen_value[0][0][0]
+    else:
+        koppen_value = 0
+
+    climateregion_path = "climate_classification/world_climate_regions_Sayre.tif"
+    cliregion_value = sgf.getCoordinatePixel(climateregion_path, longitude, latitude)
+
+    if len(cliregion_value[0]) > 0:
+        cliregion_value = cliregion_value[0][0][0]
+    else:
+        cliregion_value = 0
+
+    return [koppen_value, cliregion_value]
+
+
 def cumulative_socemissions_for_20years(years_usingtec, factor_20years, soil_c_stock):
-    """Function that calculates the soc changes for 20 years"""
+    """Function that calculates the soc changes for 20 years
+    :param years_usingtec:
+    :param factor_20years:
+    :param soil_c_stock:
+    :return:
+    """
 
     if years_usingtec < 20:
         if factor_20years == 1:
@@ -517,3 +558,34 @@ def cumulative_socemissions_for_20years(years_usingtec, factor_20years, soil_c_s
 
     return [annual_change,
             Cumulative_considering_20_years]
+
+
+def mot_climate_classification(cl_classification):
+    """
+
+    :param cl_classification:
+    :return:
+    """
+    koppenclimate = np.nan
+    sayreclimate = np.nan
+
+    koppen = cl_classification[0]
+    sayre = cl_classification[1]
+
+    for i in tl.world_climate_koppen.keys():
+        if koppen in tl.world_climate_koppen[i][0]:
+            koppenclimate = i
+
+    if np.logical_not(pd.isnull(koppenclimate)):
+        cl_eng_class = koppenclimate
+
+    else:
+        for i in tl.world_climate_sayre.keys():
+            if sayre in tl.world_climate_sayre[i][0]:
+                sayreclimate = i
+
+        cl_eng_class = sayreclimate
+
+    if pd.isnull(cl_eng_class):
+        cl_eng_class = "temperate continental"
+    return cl_eng_class
