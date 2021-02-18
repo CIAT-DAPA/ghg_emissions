@@ -1,4 +1,4 @@
-# Greenhouse gas (GHG) emissions for agriculture
+# Auto-CCAFS-MOT: a batch calculator tool for farmers GHG emissions
 <p align="center">
 <img src="https://ciat.cgiar.org/wp-content/uploads/Alliance_logo.png" alt="CIAT" id="logo" data-height-percentage="90" data-actual-width="140" data-actual-height="55">
 <img src="images/CCAFS.png" alt="CCAFS" id="logo2" data-height-percentage="90" width="230" height="52">
@@ -7,7 +7,7 @@
 
 ## Introduction
 
-The GHG measurement, produced by agricultural activities such as fertilizers, irrigation, tillage, among others, is important for quantifying the impact that this sector has on climate change. For that reason, several methodologies have been proposed to address a baseline measurement using data from farmers. The main purpose of this repository is to offer a tool that is able to estimate GHG emissions for multiple commercial cropping events. It is important to mention that this work is based on the Mitigation Option Tool for Agriculture project ([CCAFS - MOT](https://ccafs.cgiar.org/research/projects/mitigation-options-tool-agriculture-ccafs-mot)) developed by CCAFS and The Aberdeen University. 
+The greenhouse gas (GHG) emissions measurement, produced by agricultural activities such as fertilizers, irrigation, tillage, among others, is important for quantifying the impact that this sector has on climate change. For that reason, several methodologies have been proposed to address a baseline measurement using data from farmers. The main purpose of this repository is to offer a tool that is able to estimate GHG emissions for multiple commercial cropping events. It is important to mention that this work is based on the Mitigation Option Tool for Agriculture project ([CCAFS - MOT](https://ccafs.cgiar.org/research/projects/mitigation-options-tool-agriculture-ccafs-mot)) developed by CCAFS and The Aberdeen University. 
 
 
 ## Requirements
